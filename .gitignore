@@ -1,0 +1,6 @@
+app/*
+data/*
+experiments/*
+trained_models/*
+gui/runtime/*
+__pycache__

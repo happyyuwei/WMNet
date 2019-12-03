@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Configuration Settings</title>
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+  <!-- <link rel="stylesheet" href="./style.css"> -->
+  <link rel="stylesheet" href="./libs/bootstrap.min.css">
+  <!-- <script src="./libs/jquery-3.4.1.slim.min.js"></script>
+  <script src="./libs/popper.min.js"></script>
+  <script src="./libs/bootstrap.min.js"></script> -->
+  <style>
+    p {
+      font-style: italic;
+      font-size: smaller;
+    }
+
+    .top-bar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+    }
+
+    #config-root {
+      position: absolute;
+      top: 50px
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar">
+    <div class="input-group mb-3 input-group-sm">
+      <input id="search-bar" type="text" class="form-control" placeholder="Search Settings (Press Enter)">
+    </div>
+  </div>
+
+
+
+  <ul class="list-group" id="config-root">
+    <!-- <li class="list-group-item" style="border: white 0px solid;">
+      <h4>Callback</h4>
+      <ul class="list-group">
+        <li class="list-group-item" style="border: white 0px solid;">
+          <div>
+            <h6>Training Callback</h6>
+          </div>
+        </li>
+        <li class="list-group-item" style="border: white 0px solid;">
+          <h6>Callback Args</h6>
+          <p>display this is a callback function about how to use a now and white black to a socila.</p>
+          <div class="input-group mb-3 input-group-sm">
+            <input type="text" class="form-control">
+          </div>
+        </li>
+      </ul>
+    </li>
+    <li class="list-group-item" style="border: white 0px solid;">
+      <div>
+        <h4>Training</h4>
+
+      </div>
+    </li>
+ -->
+  </ul>
+
+
+
+  <script>
+    //导入包
+    const fs = require("fs");
+    const remote = require('electron').remote;
+
+    //从命令行获取配置文件位置
+    let args = remote.process.argv
+    let configPath = args[2];
+
+    //若存在配置文件则使用该路径配置文件
+    if (configPath != undefined) {
+      configPath = configPath.split("=")[1]
+    } else {
+      //若配置文件不存在，则使用默认路径配置文件
+      configPath = "./config.json"
+    }
+
+    //载入配置文件
+    fs.readFile(configPath, (err, data) => {
+      //如果配置文件不存在
+      if (err) {
+        alert("配置文件不存在：" + configPath)
+      } else {
+        //启动渲染
+        start(data.toString());
+      }
+    });
+
+    //所有包含子标题的DOM元素，搜索的时候直接搜索该列表即可
+    let titleDOMList = [];
+
+    /**
+     * 启动渲染
+     **/
+    let start = (config_data) => {
+      //解析JSON字符串
+      let config = JSON.parse(config_data);
+      //渲染
+      updateUI(config);
+      console.log(titleDOMList);
+
+      let currentSearchNum = -1;
+
+      //所搜
+      let search = (searchWord) => {
+        //临时变量
+        let chooseEnable = true;
+        let chosenList = [];
+
+        //search in all list
+        for (let i = 0; i < titleDOMList.length; i++) {
+          //支持不分大小写搜索
+          let index = titleDOMList[i].innerText.toLocaleLowerCase().search(searchWord);
+          //找到，将滚轮至于此数
+          if (index >= 0) {
+            chosenList.push({
+              "id": i,
+              "index": index
+            });
+          }
+        }
+        for (let i = 0; i < chosenList.length; i++) {
+          let j = chosenList[i]["id"];
+          let index = chosenList[i]["index"]
+          // 将字符串分成三半，查询高亮的和非高亮的
+          leftPart = titleDOMList[j].innerText.substr(0, index - 1);
+          lightPart = titleDOMList[j].innerText.substr(index, searchWord.length);
+          rightPart = titleDOMList[j].innerText.substr(searchWord.length);
+
+          //每次移动
+          if (i == currentSearchNum + 1) {
+            //高亮
+            titleDOMList[j].innerHTML = leftPart + "<span class='bg-danger'>" + lightPart + "</span>" + rightPart;
+            //使用锚定位
+            window.location.hash = "#title-" + i;
+            //由于锚定位会把定位元素放在最上面，而我们希望元素到中间去，因此还要在调整一下滚动条
+            //没有很好理解scroll的位置，目前-150只能是反复调处来的
+            window.scrollTo(0, document.documentElement.scrollTop - 150);
+          } else {
+            //高亮
+            titleDOMList[j].innerHTML = leftPart + "<span class='bg-warning'>" + lightPart + "</span>" + rightPart;
+          }
+        }
+      };
+
+      //设置搜索监听
+      let searchBar = document.getElementById("search-bar");
+      // searchBar.addEventListener("change", () => {
+      //   //先要更新UI把刚才的高亮去除
+      //   updateUI(config);
+      //   //搜索
+      //   search();
+      // });
+      let lastSearchWord = "";
+      searchBar.addEventListener("keyup", (e) => {
+        //先要更新UI把刚才的高亮去除
+        updateUI(config);
+        //支持不分大小写搜索
+        let searchWord = searchBar.value.toLocaleLowerCase();
+        if (searchWord == lastSearchWord) {
+          //往后一个
+          currentSearchNum = currentSearchNum + 1;
+        } else {
+          lastSearchWord = searchWord;
+          currentSearchNum = -1;
+        }
+        search(searchWord);
+      });
+    }
+
+    /**
+    **创建一个配置选项卡
+    */
+    let createSubItem = (config, category, title) => {
+
+      //获取配置项
+      let configItem = config[category][title];
+      let type = typeof configItem["value"];
+
+      let itemElement = document.createElement("li");
+      itemElement.setAttribute("class", "list-group-item");
+      itemElement.setAttribute("style", "border: white 0px solid;")
+
+      //标题
+      let titleElement = document.createElement("h6");
+      titleElement.setAttribute("class", "text-muted");
+      //展示的时候，中间下划线去掉，每个单词开头字母大写
+      titleElement.innerText = title.split("_").map(upperFirst).join(" ");
+      titleElement.setAttribute("id", "title-" + titleDOMList.length);
+
+      //描述
+      let descElement = document.createElement("p");
+      descElement.setAttribute("class", "text-muted");
+      descElement.innerText = configItem["desc"];
+
+      //输入
+      let inputDiv = document.createElement("div");
+      inputDiv.setAttribute("class", "input-group mb-3 input-group-sm");
+      let inputElement = document.createElement("input");
+      inputElement.setAttribute("type", "text");
+      inputElement.setAttribute("class", "form-control");
+
+      // console.log(typeof configItem["value"])
+      //若为数组，显示时统一都按照逗号加空格分开的形式
+      if (typeof configItem["value"] == "object") {
+        //若判断为对象，默认为数组
+        //输入框中的结果统一用头号加一个空格隔开
+        inputElement.value = configItem["value"].join(", ")
+      } else {
+        inputElement.value = configItem["value"];
+      }
+
+      inputDiv.appendChild(inputElement);
+
+      //添加输入事件，一旦有改变立刻保存，无需手动保存。
+      inputElement.addEventListener("change", () => {
+        //判断原始数据类型
+        let type = typeof configItem["value"];
+        console.log(type);
+        if (type == "number") {
+          //转成数字，为了统一，全部转成小数
+          configItem["value"] = parseFloat(inputElement.value);
+        } else if (type == "boolean") {
+          //布尔型
+          configItem["value"] = inputElement.value.toLocaleLowerCase() === "true";
+          inputElement.value = configItem["value"]
+        } else if (type == "object") {
+          //若判断为对象，默认为数组
+          //先将空格去除, 使用正则表达式。再按逗号隔开
+          let valueArray = inputElement.value.replace(/ /g, "").split(",");
+          //输入框中的结果统一用头号加一个空格隔开
+          inputElement.value = valueArray.join(", ")
+          //更新
+          configItem["value"] = valueArray;
+        } else {
+          //其余按字符串处理
+          //更新内容
+          configItem["value"] = inputElement.value;
+        }
+        //立即保存
+        fs.writeFile(configPath, JSON.stringify(config), function (err) {
+          if (err) {
+            alert("保存失败");
+          }
+        });
+      });
+
+      //append
+      itemElement.appendChild(titleElement);
+      itemElement.appendChild(descElement);
+      itemElement.appendChild(inputDiv);
+
+      //将标题元素进行保存
+      titleDOMList.push(titleElement);
+
+      return itemElement;
+    }
+
+
+    let createItem = (config, catagory) => {
+      //创建列表
+      let itemElement = document.createElement("li");
+      itemElement.setAttribute("class", "list-group-item");
+      itemElement.setAttribute("style", "border: white 0px solid;");
+
+      //title
+      let titleElement = document.createElement("h4");
+      titleElement.setAttribute("class", "text-muted");
+      //展示时首字母大写
+      titleElement.innerText = upperFirst(catagory);
+
+      let listElement = document.createElement("ul");
+      listElement.setAttribute("class", "list-group");
+      //获取顺序
+      let keyList = config[catagory]["keys"];
+      //依次遍历
+      for (let i = 0; i < keyList.length; i++) {
+        //创建配置项并追加
+        listElement.appendChild(createSubItem(config, catagory, keyList[i]));
+      }
+
+      itemElement.appendChild(titleElement);
+      itemElement.appendChild(listElement);
+
+      return itemElement;
+    }
+
+    let updateUI = (config) => {
+
+      // 清空DOM列表，重新刷新
+      titleDOMList.length = 0;
+
+      //获取根节点
+      let root = document.getElementById("config-root");
+      //清空DOM
+      root.innerHTML = "";
+
+      //获取所有跟配置项
+      let keyList = config["keys"];
+      //渲染
+      for (let i = 0; i < keyList.length; i++) {
+        let item = createItem(config, keyList[i])
+        root.appendChild(item);
+      }
+    }
+
+    /**
+     * 首字母大写
+     */
+    let upperFirst = (str) => {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+  </script>
+</body>
+
+</html>
