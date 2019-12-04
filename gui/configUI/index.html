@@ -111,12 +111,10 @@
       updateUI(config);
       console.log(titleDOMList);
 
-      let currentSearchNum = -1;
+      let currentSearchNum = 0;
 
       //所搜
       let search = (searchWord) => {
-        //临时变量
-        let chooseEnable = true;
         let chosenList = [];
 
         //search in all list
@@ -126,57 +124,69 @@
           //找到，将滚轮至于此数
           if (index >= 0) {
             chosenList.push({
-              "id": i,
+              "num": i,
               "index": index
             });
           }
         }
         for (let i = 0; i < chosenList.length; i++) {
-          let j = chosenList[i]["id"];
+          let j = chosenList[i]["num"];
           let index = chosenList[i]["index"]
           // 将字符串分成三半，查询高亮的和非高亮的
-          leftPart = titleDOMList[j].innerText.substr(0, index - 1);
-          lightPart = titleDOMList[j].innerText.substr(index, searchWord.length);
-          rightPart = titleDOMList[j].innerText.substr(searchWord.length);
+          let leftPart = titleDOMList[j].innerText.substr(0, index - 1);
+          let lightPart = titleDOMList[j].innerText.substr(index, searchWord.length);
+          let rightPart = titleDOMList[j].innerText.substr(searchWord.length);
 
           //每次移动
-          if (i == currentSearchNum + 1) {
+          if (i == currentSearchNum) {
             //高亮
             titleDOMList[j].innerHTML = leftPart + "<span class='bg-danger'>" + lightPart + "</span>" + rightPart;
             //使用锚定位
-            window.location.hash = "#title-" + i;
+            window.location.hash = "#title-" + j;
+            // console.log("#title-"+j)
             //由于锚定位会把定位元素放在最上面，而我们希望元素到中间去，因此还要在调整一下滚动条
             //没有很好理解scroll的位置，目前-150只能是反复调处来的
             window.scrollTo(0, document.documentElement.scrollTop - 150);
+            // console.log(window.location)
           } else {
             //高亮
             titleDOMList[j].innerHTML = leftPart + "<span class='bg-warning'>" + lightPart + "</span>" + rightPart;
           }
         }
+        //往后搜索
+        currentSearchNum = currentSearchNum + 1;
+        //如果到底了，就返回。
+        if (currentSearchNum == chosenList.length) {
+          currentSearchNum = 0;
+        }
       };
 
       //设置搜索监听
       let searchBar = document.getElementById("search-bar");
-      // searchBar.addEventListener("change", () => {
-      //   //先要更新UI把刚才的高亮去除
-      //   updateUI(config);
-      //   //搜索
-      //   search();
-      // });
+
+      //保存上一个搜索词
       let lastSearchWord = "";
+
       searchBar.addEventListener("keyup", (e) => {
-        //先要更新UI把刚才的高亮去除
-        updateUI(config);
-        //支持不分大小写搜索
-        let searchWord = searchBar.value.toLocaleLowerCase();
-        if (searchWord == lastSearchWord) {
-          //往后一个
-          currentSearchNum = currentSearchNum + 1;
-        } else {
-          lastSearchWord = searchWord;
-          currentSearchNum = -1;
+        //支持回车查询
+        if (e.keyCode == 13) {
+
+          //先要更新UI把刚才的高亮去除
+          updateUI(config);
+          //支持不分大小写搜索
+          let searchWord = searchBar.value.toLocaleLowerCase();
+
+          //如果搜索的和上一个不是一个词，则重头搜索
+          if (searchWord != lastSearchWord) {
+            lastSearchWord = searchWord;
+            currentSearchNum = 0;
+
+          }
+          //搜索
+          search(searchWord);
+          //由于移动滚动条以后会失去焦点，再按回车没有意义，因此要重新使输入框获取焦点。
+          searchBar.focus()
         }
-        search(searchWord);
       });
     }
 

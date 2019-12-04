@@ -224,7 +224,9 @@ def create_noise_attack_func(mean=0, sigma=0.1):
 
 
 def eval_key_sensitive(key_path, input_path, target_path, model_path, visual_result_path=None, key_bits=1024):
-
+    """
+    评估密钥敏感性
+    """
     # load model
     model = model_use.EncoderDecoder(model_path, key_enable=True)
     print("initial model....")

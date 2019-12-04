@@ -90,6 +90,7 @@ def save_images(image_list, title_list, image_dir, seq=""):
 
 def read_image(path, width, height, change_scale=False, binary=False):
     """
+    按指定大小读取图片，注意：如果尺寸和实际尺寸不符合，会进行裁剪或者填充以满足指定尺寸。
     @update 2019.11.27
     从train_watermark中将该函数移至此处，作为基础设施
 

@@ -176,6 +176,7 @@ def create_config_temple(config_dir, buffer_size=0, batch_size=1, image_width=12
     for i in range(len(config_lines)):
         config_lines[i] = "{} {} {}\n".format(config_lines[i], SPLIT, value[i])
 
+    #保存
     with open(config_dir, "w") as f:
         f.writelines(config_lines)
 
@@ -193,9 +194,14 @@ class ConfigLoader:
         :param config_dir:
         """
 
+        # 旧属性兼容
+        old_attribate_enable = False
+
         if config_dir == None:
             # set default params
             self.config = default_config
+            # 目前均会启用旧属性兼容
+            old_attribate_enable = True
         else:
             # load from file
             """
@@ -209,53 +215,8 @@ class ConfigLoader:
                 with open(config_dir, "r", encoding="utf-8") as f:
                     self.config = json.load(f)
 
-                # 兼容旧版本访问方式，旧属性目前依旧可以访问
-                # buffer size
-                self.buffer_size = self.config["dataset"]["buffer_size"]["value"]
-                # batch size
-                self.batch_size = self.config["dataset"]["batch_size"]["value"]
-                # image width
-                self.image_width = self.config["dataset"]["image_size"]["value"][0]
-                # image height
-                self.image_height = self.config["dataset"]["image_size"]["value"][1]
-                # channel
-                self.image_channel = self.config["dataset"]["image_size"]["value"][2]
-                # input number
-                self.input_num = self.config["dataset"]["input_number"]["value"]
-                # data flip
-                self.data_flip = self.config["augmentation"]["data_flip"]["value"]
-                # crop width
-                self.crop_width = self.config["augmentation"]["crop_size"]["value"][0]
-                # crop height
-                self.crop_height = self.config["augmentation"]["crop_size"]["value"][1]
-                # training callback
-                self.training_callback = self.config["callback"]["training_callback"]["value"]
-                # callback args
-                self.callback_args = self.config["callback"]["callback_args"]["value"]
-                # parse lambda array
-                self.lambda_array = [
-                    float(x) for x in self.config["callback"]["lambda"]["value"]]
-                # generator
-                self.generator = self.config["training"]["generator"]["value"]
-                # discriminator
-                self.discriminator = self.config["training"]["discriminator"]["value"]
-                # epoch
-                self.epoch = self.config["training"]["epoch"]["value"]
-                # save period
-                self.save_period = self.config["training"]["save_period"]["value"]
-                # data dir
-                self.data_dir = self.config["training"]["data_dir"]["value"]
-                # checkpoints
-                self.checkpoints_dir = self.config["training"]["checkpoints_dir"]["value"]
-                # log dir
-                self.log_dir = self.config["training"]["log_dir"]["value"]
-                # training device
-                self.training_device = self.config["training"]["training_device"]["value"]
-                # remove history
-                self.remove_history_checkpoints = self.config[
-                    "training"]["remove_history_checkpoints"]["value"]
-                # load latest checkpoint
-                self.load_latest_checkpoint = self.config["training"]["load_latest_checkpoints"]["value"]
+                # 目前均会启用旧属性兼容
+                old_attribate_enable = True
 
             else:
                  # 向下兼容代码
@@ -379,3 +340,52 @@ class ConfigLoader:
                 # parse lambda array
                 self.lambda_array = get_value(
                     self.config_list, LAMBDA, type="array_float")
+
+        if old_attribate_enable == True:
+            # 兼容旧版本访问方式，旧属性目前依旧可以访问
+            # buffer size
+            self.buffer_size = self.config["dataset"]["buffer_size"]["value"]
+            # batch size
+            self.batch_size = self.config["dataset"]["batch_size"]["value"]
+            # image width
+            self.image_width = self.config["dataset"]["image_size"]["value"][0]
+            # image height
+            self.image_height = self.config["dataset"]["image_size"]["value"][1]
+            # channel
+            self.image_channel = self.config["dataset"]["image_size"]["value"][2]
+            # input number
+            self.input_num = self.config["dataset"]["input_number"]["value"]
+            # data flip
+            self.data_flip = self.config["augmentation"]["data_flip"]["value"]
+            # crop width
+            self.crop_width = self.config["augmentation"]["crop_size"]["value"][0]
+            # crop height
+            self.crop_height = self.config["augmentation"]["crop_size"]["value"][1]
+            # training callback
+            self.training_callback = self.config["callback"]["training_callback"]["value"]
+            # callback args
+            self.callback_args = self.config["callback"]["callback_args"]["value"]
+            # parse lambda array
+            self.lambda_array = [
+                float(x) for x in self.config["callback"]["lambda"]["value"]]
+            # generator
+            self.generator = self.config["training"]["generator"]["value"]
+            # discriminator
+            self.discriminator = self.config["training"]["discriminator"]["value"]
+            # epoch
+            self.epoch = self.config["training"]["epoch"]["value"]
+            # save period
+            self.save_period = self.config["training"]["save_period"]["value"]
+            # data dir
+            self.data_dir = self.config["training"]["data_dir"]["value"]
+            # checkpoints
+            self.checkpoints_dir = self.config["training"]["checkpoints_dir"]["value"]
+            # log dir
+            self.log_dir = self.config["training"]["log_dir"]["value"]
+            # training device
+            self.training_device = self.config["training"]["training_device"]["value"]
+            # remove history
+            self.remove_history_checkpoints = self.config[
+                "training"]["remove_history_checkpoints"]["value"]
+            # load latest checkpoint
+            self.load_latest_checkpoint = self.config["training"]["load_latest_checkpoints"]["value"]
