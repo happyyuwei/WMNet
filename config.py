@@ -69,42 +69,42 @@ default_config = {
         },
         "data_dir": {
             "value": "./data/",
-            "disc": "训练数据集所在路径，相对位置为当前应用app所在位置。"
+            "desc": "训练数据集所在路径，相对位置为当前应用app所在位置。"
         },
         "checkpoints_dir": {
             "value": "./training_checkpoints/",
-            "disc": "保存检查点路径，相对位置为当前应用app所在位置。"
+            "desc": "保存检查点路径，相对位置为当前应用app所在位置。"
         },
         "log_dir": {
             "value": "./log/",
-            "disc": "保存训练日志路径，相对位置为当前应用app所在位置。"
+            "desc": "保存训练日志路径，相对位置为当前应用app所在位置。"
         },
         "training_device": {
             "value": "GPU",
-            "disc": "训练使用设备，默认使用GPU训练。可选择：CPU，GPU。"
+            "desc": "训练使用设备，默认使用GPU训练。可选择：CPU，GPU。"
         },
         "remove_history_checkpoints": {
             "value": True,
-            "disc": "则只保留最近的训练检查点。若启用该设置，早期检查点均会被移除且无法复原。（注意：若禁用该设置，则所有保存点会被保留，会占用大量磁盘空间。）"
+            "desc": "则只保留最近的训练检查点。若启用该设置，早期检查点均会被移除且无法复原。（注意：若禁用该设置，则所有保存点会被保留，会占用大量磁盘空间。）"
         },
         "load_latest_checkpoints": {
             "value": True,
-            "disc": "载入最近的检查点。若关闭该设置，将从头开始训练。"
+            "desc": "载入最近的检查点。若关闭该设置，将从头开始训练。"
         }
     },
     "callback": {
         "keys": ["training_callback", "callback_args", "lambda"],
         "training_callback": {
             "value": "train_watermark.InvisibleWMCallback",
-            "disc": "设置自定义的回调类，常用与自定义损失函数。若使用默认回调,请输入： default。"
+            "desc": "设置自定义的回调类，常用与自定义损失函数。若使用默认回调,请输入： default。"
         },
         "callback_args": {
             "value": [],
-            "disc": "设置回调函数输入参数，用于初始化自定义的回调参数。输入内容为数组，每个元素请用空格隔开。"
+            "desc": "设置回调函数输入参数，用于初始化自定义的回调参数。输入内容为数组，每个元素请用空格隔开。"
         },
         "lambda": {
             "value": [1, 1],
-            "disc": "设置损失函数超参数。输入内容为数组，每个元素请用空格隔开。"
+            "desc": "设置损失函数超参数。输入内容为数组，每个元素请用空格隔开。"
         }
     }
 }

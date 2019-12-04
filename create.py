@@ -24,6 +24,27 @@ def create_train_bootstrap(watermark, extern_script=None):
         f.writelines(cmd)
 
 
+def create_config_bootstrap(app_name):
+    """
+    用于生成配置界面启动脚本, 配置界面功能已启用，不需要盯着晦涩的配置文件修改了。
+    @since 2019.12.3
+    @author yuwei
+    """
+
+    #此命令用于隐藏cmd的黑框
+    invisible_cmd = ['@echo off\r\n',
+                     'if "%1" == "h" goto begin\r\n',
+                     'mshta vbscript:createobject("wscript.shell").run("%~nx0 h",0)(window.close)&&exit\r\n',
+                     ':begin\r\n']
+
+    # 运行cmd
+    run_cmd = "python ../../gui/ConfigUI/bootstrap.py -a {}\r\n".format(app_name)
+
+    with open("config.bat", "w") as f:
+        f.writelines(invisible_cmd)
+        f.writelines([run_cmd])
+
+
 def create_app(app_name, watermark, dataset, extern_script, conf):
     """
     create an empty app
@@ -55,6 +76,8 @@ def create_app(app_name, watermark, dataset, extern_script, conf):
 
     # create bootstrap train.bat
     create_train_bootstrap(watermark, extern_script)
+    # create config.bat
+    create_config_bootstrap(app_name)
     # create paint script paint_loss.bat
     with open("paint_loss.bat", "w") as f:
         f.writelines(["python ../../paint_loss.py"])
