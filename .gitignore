@@ -1,6 +1,6 @@
-app/*
-data/*
-experiments/*
-trained_models/*
+app/*[!*.md]
+data/*[!*.md]
+experiments/*[!*.md]
+trained_models/*[!*.md]
 gui/runtime/*
 __pycache__
