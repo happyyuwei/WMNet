@@ -1,6 +1,7 @@
 app/*[!*.md]
 data/*[!*.md]
-experiments/*[!*.md]/*[!*.md]
+experiments/*[!*.md]
+!experiments/*/*.py
 trained_models/*[!*.md]
 gui/runtime/*
 __pycache__
