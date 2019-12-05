@@ -247,11 +247,27 @@
           configItem["value"] = inputElement.value.toLocaleLowerCase() === "true";
           inputElement.value = configItem["value"]
         } else if (type == "object") {
+          console.log(configItem["value"])
           //若判断为对象，默认为数组
           //先将空格去除, 使用正则表达式。再按逗号隔开
           let valueArray = inputElement.value.replace(/ /g, "").split(",");
           //输入框中的结果统一用头号加一个空格隔开
           inputElement.value = valueArray.join(", ")
+          /**
+          * @since 2019.12.5
+          * @author yuwei
+          * 修复bug: 无论输入什么类型，最终输出字符串类型
+          **/
+          //判断数组元素类型
+          //如果元素为空，则只能按照字符串处理，否则判断元素类型
+          if (configItem["value"].length > 0) {
+            array_type = typeof configItem["value"][0];
+            console.log(array_type)
+            //如果是数字则转成Float
+            if (array_type == "number") {
+              valueArray = valueArray.map(parseFloat)
+            }
+          }
           //更新
           configItem["value"] = valueArray;
         } else {
