@@ -64,7 +64,7 @@ class InvisibleWMCallback:
         # @update 2019.11.27
         # @author yuwei
         # 修复相对路径bug,否则无法载入模型
-        self.decoder_model = EncoderDecoder("../../trained_models/auto_mnist")
+        self.decoder_model = EncoderDecoder("../../trained_models/auto_cifar")
         print("load decoder successfully...")
 
         # checkpoints of extractor
