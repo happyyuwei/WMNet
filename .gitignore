@@ -1,9 +1,9 @@
 app/*[!*.md]
 data/*[!*.md]
-experiments/attack/*[!*.py]
-experiments/fidelity/*[!*.py]
-experiments/key_sensitive/*[!*.py]
-# experiments/*[!*.md]
+# experiments/attack/*[!*.py]
+# experiments/fidelity/*[!*.py]
+# experiments/key_sensitive/*[!*.py]
+experiments/*/*[!*.py]
 trained_models/*[!*.md]
 gui/runtime/*
 __pycache__
