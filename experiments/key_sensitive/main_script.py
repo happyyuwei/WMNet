@@ -59,7 +59,7 @@ if __name__ == "__main__":
         result.append(list)
         np_result=np.array(result)
         #每次都刷新文件
-        np.savetxt("./test4/result.txt",np_result, "%.2f")
+        np.savetxt("./c/result.txt",np_result, "%.2f")
         print("image {} ...".format(i))
         print("-----------------------------------------------------------------------\n")
 

@@ -72,7 +72,7 @@ if __name__ == "__main__":
             func = create_noise_attack_func(sigma=x)
             x_list.append(x)
         elif attack == "crop":
-            x = i*4
+            x = i*5
             func = create_crop_attack_func(crop_width=x)
             x_list.append(x)
 
