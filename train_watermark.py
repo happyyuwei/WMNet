@@ -98,10 +98,10 @@ class InvisibleWMCallback:
         # l1 loss, error between the ground truth and the gen output
         l1_loss = tf.reduce_mean(tf.abs(gen_output - target))
 
-         # no attack
+        # no attack
         ext_input = gen_output
 
-        #攻击pipline
+        # 攻击pipline
         # create watermark
         if self.noise_attack == True:
             # create normal noise sigma from 0-0.4
@@ -110,15 +110,15 @@ class InvisibleWMCallback:
             normal_noise = np.random.normal(0, scale=sigma, size=[128, 128, 3])
             # 添加噪声
             ext_input = gen_output+normal_noise
-        
+
         if self.crop_attack == True:
             # 创建掩码
             crop_mask = np.ones([1, 128, 128, 3], dtype=np.float32)
             # 裁剪长度为0-30个像素宽度
             crop_width = np.random.randint(0, 30)
-            crop_mask[:, :, 0:crop_width, :] = -1
+            crop_mask[:, :, 0:crop_width, :] = 0
             # 裁剪
-            ext_input = tf.multiply(gen_output, crop_mask)
+            ext_input = tf.multiply(gen_output, crop_mask)+crop_mask-1
 
         # extract the gen output (with watermark)=>watermark
         extract_watermark = self.extractor(ext_input, training=True)

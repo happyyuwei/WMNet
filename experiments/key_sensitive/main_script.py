@@ -51,13 +51,14 @@ if __name__ == "__main__":
     # plt.show()
 
     result=[]
-    for i in range(1,21):
+    for i in range(1,5):
 
         list = eval_key_sensitive(key_path="../../watermark/key.npy", input_path="./test4/data/{}_EN.png".format(i),
                               target_path="./test4/data/{}_IN.png".format(i), model_path="./test4/training_checkpoints")
         
         result.append(list)
         np_result=np.array(result)
+        #每次都刷新文件
         np.savetxt("./test4/result.txt",np_result, "%.2f")
         print("image {} ...".format(i))
         print("-----------------------------------------------------------------------\n")

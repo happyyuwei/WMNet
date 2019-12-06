@@ -222,6 +222,24 @@ def create_noise_attack_func(mean=0, sigma=0.1):
 
     return attack_nosie_test
 
+def create_crop_attack_func(crop_width):
+    """
+    This function will return a function of creating nrop
+    @since 2019.12.6
+    @author yuwei
+    """
+    def attack_crop_test(image):
+        # 创建掩码
+        crop_mask = np.ones([1, 128, 128, 3], dtype=np.float32)
+        # 裁剪长度为0-30个像素宽度
+        crop_mask[:, :, 0:crop_width, :] = 0
+        # 裁剪
+        image = tf.multiply(image, crop_mask)+crop_mask-1
+
+        return image
+
+    return attack_crop_test
+
 
 def eval_key_sensitive(key_path, input_path, target_path, model_path, visual_result_path=None, key_bits=1024):
     """
@@ -276,8 +294,9 @@ def eval_key_sensitive(key_path, input_path, target_path, model_path, visual_res
 
         result_list.append(psnr["psnr"])
 
-        print("eval {}..., psnr={}".format(i, psnr["psnr"]))
+        print("\r"+"eval {}..., psnr={}".format(i, psnr["psnr"]), end="", flush=True)
 
+    print()
     # delete temp key file
     os.remove("~temp_key.npy")
 
