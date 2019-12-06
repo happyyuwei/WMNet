@@ -52,6 +52,12 @@ if __name__ == "__main__":
     psnr_list=[]
     sigma_list=[]
 
+    if is_binary==True:
+        value="wm_ber"
+    else:
+        value="wm_psnr"
+
+
 
     # range from 0, 0.05, 0.1, ..., 0.45, 0.5
     for i in range(0, 11):
@@ -64,8 +70,8 @@ if __name__ == "__main__":
                           watermark_path=watermark,
                           watermark_binary=is_binary, decode_path=decoder,
                           attack_test_func=func)
-        
-        psnr_list.append(wm_results["mean_value"]["wm_ber"])
+    
+        psnr_list.append(wm_results["mean_value"][value])
         sigma_list.append(sigma)
         print("---------------------------------------------------------------------------------------")
         print("sigma={}".format(sigma))
