@@ -1,9 +1,11 @@
+import sys
+sys.path.append("../../")
+
 import getopt
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from evaluate import eval_all, create_noise_attack_func, create_crop_attack_func
-import sys
-sys.path.append("../../")
+
 
 
 if __name__ == "__main__":
@@ -53,8 +55,8 @@ if __name__ == "__main__":
 
     print("attack={}".format(attack))
 
-    psnr_list = []
-    sigma_list = []
+    y_list = []
+    x_list = []
 
     if is_binary == True:
         value = "wm_ber"
@@ -66,26 +68,27 @@ if __name__ == "__main__":
 
         # create attack
         if attack == "noise":
-            sigma = i*0.05
-            func = create_noise_attack_func(sigma=sigma)
+            x = i*0.05
+            func = create_noise_attack_func(sigma=x)
+            x_list.append(x)
         elif attack == "crop":
-            crop_width = i*3
-            func = create_crop_attack_func(crop_width=crop_width)
+            x = i*4
+            func = create_crop_attack_func(crop_width=x)
+            x_list.append(x)
 
         # eval
         wm_results, wm_report = eval_all(data_path=dataset,
                                          model_path=model,
                                          watermark_path=watermark,
                                          watermark_binary=is_binary, decode_path=decoder,
-                                         attack_test_func=func)
+                                         attack_test_func=func, visual_result_dir="f")
 
-        psnr_list.append(wm_results["mean_value"][value])
-        sigma_list.append(sigma)
+        y_list.append(wm_results["mean_value"][value])
         print("---------------------------------------------------------------------------------------")
-        print("sigma={}".format(sigma))
+        print("x={}".format(x))
         print(wm_report)
         print("---------------------------------------------------------------------------------------")
 
-    print(psnr_list)
-    plt.plot(sigma_list, psnr_list)
+    print(y_list)
+    plt.plot(x_list, y_list)
     plt.show()

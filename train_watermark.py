@@ -114,8 +114,8 @@ class InvisibleWMCallback:
         if self.crop_attack == True:
             # 创建掩码
             crop_mask = np.ones([1, 128, 128, 3], dtype=np.float32)
-            # 裁剪长度为0-30个像素宽度
-            crop_width = np.random.randint(0, 30)
+            # 裁剪长度为0-50个像素宽度
+            crop_width = np.random.randint(0, 50)
             crop_mask[:, :, 0:crop_width, :] = 0
             # 裁剪
             ext_input = tf.multiply(gen_output, crop_mask)+crop_mask-1
