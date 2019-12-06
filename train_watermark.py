@@ -8,9 +8,9 @@ import os
 
 from model import invisible_extract
 from model_use import EncoderDecoder
+from config import ArgsParser
 import train_tool
 import train
-import config
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -38,21 +38,22 @@ class InvisibleWMCallback:
         # lambdas in loss
         self.lambda_wm_positive = self.config_loader.lambda_array[0]
         self.lambda_wm_negitive = self.config_loader.lambda_array[1]
-        print("fuck...")
 
-        # 解析所有回调函数中的参数
-        args_parser = config.ArgsParser(self.config_loader.callback_args)
-        # 对抗训练 攻击类型
-        attack_type = args_parser.get("attack")
+        # 解析所有配置
+        args_parser = ArgsParser(self.config_loader.callback_args)
+
         # 解码器
         self.decoder_path = args_parser.get("decoder")
-        
-        
 
         # training noise attack
-        self.noise_attack = (attack_type == "noise")
+        self.noise_attack = args_parser.get("noise") in ("True", "true")
         print("noise attack:{}".format(self.noise_attack))
 
+        # 训练随机裁剪增加水印裁剪攻击能力
+        self.crop_attack = args_parser.get("crop") in ("True", "true")
+        print("crop attack:{}".format(self.crop_attack))
+
+        # lambdas
         print("lp={}, ln={}".format(
             self.lambda_wm_positive, self.lambda_wm_negitive))
 
@@ -97,16 +98,27 @@ class InvisibleWMCallback:
         # l1 loss, error between the ground truth and the gen output
         l1_loss = tf.reduce_mean(tf.abs(gen_output - target))
 
+         # no attack
+        ext_input = gen_output
+
+        #攻击pipline
         # create watermark
         if self.noise_attack == True:
             # create normal noise sigma from 0-0.4
             sigma = np.random.random()*0.4
             # noise attack， the sigma is 0-0.4, mean is 0
             normal_noise = np.random.normal(0, scale=sigma, size=[128, 128, 3])
+            # 添加噪声
             ext_input = gen_output+normal_noise
-        else:
-            # no attack
-            ext_input = gen_output
+        
+        if self.crop_attack == True:
+            # 创建掩码
+            crop_mask = np.ones([1, 128, 128, 3], dtype=np.float32)
+            # 裁剪长度为0-30个像素宽度
+            crop_width = np.random.randint(0, 30)
+            crop_mask[:, :, 0:crop_width, :] = -1
+            # 裁剪
+            ext_input = tf.multiply(gen_output, crop_mask)
 
         # extract the gen output (with watermark)=>watermark
         extract_watermark = self.extractor(ext_input, training=True)

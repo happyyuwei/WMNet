@@ -222,6 +222,14 @@ def invoke_method_of_class(class_instance, method_name, params):
         return method(params)
     except AttributeError:
         return None
+    except Exception as e:
+        """
+        @since 3019.12.6
+        @author yuwei
+        修复Bug: 修复调用函数中遇到的任何异常均会被忽略的问题
+        """
+        print(e)
+        sys.exit()
 
 
 def train(train_dataset, test_dataset, config_loader, training_callback=None):

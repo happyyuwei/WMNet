@@ -400,27 +400,23 @@ class ArgsParser:
     """
 
     def __init__(self, args):
-        self.dict = {}
+        #传入的args是字符串
+        self.args_dict = {}
+
         if len(args) >= 1:
-            # 去掉空格
-            arr = args.replace(" ", "").split("--")
-            for each in arr:
-                #解析
-                key, value=each.split("=")
-                #存储
-                self.dict[key]=value
-        
-        print("callback args:{}".format(self.dict))
-    
+            for each in args:
+                # 解析
+                key, value = each.split("=")
+                # 存储
+                self.args_dict[key.replace("--","")] = value
+
+        print("callback args:{}".format(self.args_dict))
+
     def get(self, key):
         """
         获取参数，若不存在，返回None
         """
         try:
-            return self.dict[key]
+            return self.args_dict[key]
         except KeyError:
             return None
-        
-    
-
-

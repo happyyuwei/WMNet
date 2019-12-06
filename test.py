@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-tf.enable_eager_execution()
+# tf.enable_eager_execution()
 import loader
 import config
 import matplotlib.pyplot as plt
@@ -233,8 +233,13 @@ import model_use
 
 # plt.imshow(d)
 # plt.show()
-a="c.json"
-if ".json" in a:
-    print("x")
-else:
-    print("y")
+
+
+
+# a=np.ones([1,128,128,3])
+# a[:,:,0:20,:]=-1
+# plt.imshow(a)
+# plt.show()
+
+print(None in ("True","true"))
+
