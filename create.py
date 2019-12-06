@@ -72,6 +72,7 @@ def create_app(app_name, watermark, dataset, extern_script, conf):
     if ".json" in conf:
         config.create_config_JSON_temple(conf)
     else:
+        # 目前依旧支持生成旧版配置文件， 但不推荐
         config.create_config_temple("config.txt")
 
     # create bootstrap train.bat

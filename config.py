@@ -99,8 +99,8 @@ default_config = {
             "desc": "设置自定义的回调类，常用与自定义损失函数。若使用默认回调,请输入： default。"
         },
         "callback_args": {
-            "value": [],
-            "desc": "设置回调函数输入参数，用于初始化自定义的回调参数。输入内容为数组，每个元素请用空格隔开。"
+            "value": ["--decoder=../../trained_models/auto_cifar"],
+            "desc": "设置回调函数输入参数，用于初始化自定义的回调参数。目前支持--key=value格式。输入内容为数组，每个元素请用逗号隔开。目前有效参数：--decoder, --attack。"
         },
         "lambda": {
             "value": [1, 1],
@@ -176,7 +176,7 @@ def create_config_temple(config_dir, buffer_size=0, batch_size=1, image_width=12
     for i in range(len(config_lines)):
         config_lines[i] = "{} {} {}\n".format(config_lines[i], SPLIT, value[i])
 
-    #保存
+    # 保存
     with open(config_dir, "w") as f:
         f.writelines(config_lines)
 
@@ -389,3 +389,38 @@ class ConfigLoader:
                 "training"]["remove_history_checkpoints"]["value"]
             # load latest checkpoint
             self.load_latest_checkpoint = self.config["training"]["load_latest_checkpoints"]["value"]
+
+
+class ArgsParser:
+    """
+    将输入参数转化成key-vale,
+    主要用于回调函数的参数中，支持--key=value格式
+    @author yuwei
+    @since 2019.12.6
+    """
+
+    def __init__(self, args):
+        self.dict = {}
+        if len(args) >= 1:
+            # 去掉空格
+            arr = args.replace(" ", "").split("--")
+            for each in arr:
+                #解析
+                key, value=each.split("=")
+                #存储
+                self.dict[key]=value
+        
+        print("callback args:{}".format(self.dict))
+    
+    def get(self, key):
+        """
+        获取参数，若不存在，返回None
+        """
+        try:
+            return self.dict[key]
+        except KeyError:
+            return None
+        
+    
+
+

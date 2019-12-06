@@ -10,6 +10,7 @@ from model import invisible_extract
 from model_use import EncoderDecoder
 import train_tool
 import train
+import config
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -30,19 +31,27 @@ class InvisibleWMCallback:
         """
         This will be invokde in initial process
         """
+        print("This class is for training the invisible watermark.")
         generator_optimizer = init_params["gen_optimizer"]
         generator = init_params["generator"]
 
         # lambdas in loss
         self.lambda_wm_positive = self.config_loader.lambda_array[0]
         self.lambda_wm_negitive = self.config_loader.lambda_array[1]
+        print("fuck...")
 
-        # training attack
-        self.noise_attack = False
-        if len(self.config_loader.callback_args)>=1:
-            if self.config_loader.callback_args[0] == "noise":
-                self.noise_attack = True
-                print("Noise attack is True...")
+        # 解析所有回调函数中的参数
+        args_parser = config.ArgsParser(self.config_loader.callback_args)
+        # 对抗训练 攻击类型
+        attack_type = args_parser.get("attack")
+        # 解码器
+        self.decoder_path = args_parser.get("decoder")
+        
+        
+
+        # training noise attack
+        self.noise_attack = (attack_type == "noise")
+        print("noise attack:{}".format(self.noise_attack))
 
         print("lp={}, ln={}".format(
             self.lambda_wm_positive, self.lambda_wm_negitive))
@@ -64,7 +73,7 @@ class InvisibleWMCallback:
         # @update 2019.11.27
         # @author yuwei
         # 修复相对路径bug,否则无法载入模型
-        self.decoder_model = EncoderDecoder("../../trained_models/auto_cifar")
+        self.decoder_model = EncoderDecoder(self.decoder_path)
         print("load decoder successfully...")
 
         # checkpoints of extractor
@@ -88,7 +97,6 @@ class InvisibleWMCallback:
         # l1 loss, error between the ground truth and the gen output
         l1_loss = tf.reduce_mean(tf.abs(gen_output - target))
 
-        
         # create watermark
         if self.noise_attack == True:
             # create normal noise sigma from 0-0.4
@@ -98,7 +106,7 @@ class InvisibleWMCallback:
             ext_input = gen_output+normal_noise
         else:
             # no attack
-            ext_input=gen_output
+            ext_input = gen_output
 
         # extract the gen output (with watermark)=>watermark
         extract_watermark = self.extractor(ext_input, training=True)
@@ -227,6 +235,7 @@ class VisibleWMCallback:
         """
         This will be invokde in initial process
         """
+        print("This class is for training the visible watermark.")
 
         # lambdas in loss
         self.lambda_wm = 1
