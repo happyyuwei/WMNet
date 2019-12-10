@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 def show_residual():
 
     # 载入图片
-    image = plt.imread("1_PR.png")[:, :, 0:3]
-    image_wm = plt.imread("1_WM.png")[:, :, 0:3]
+    image = plt.imread("87_GT.png")[:, :, 0:3]
+    image_wm = plt.imread("87_PR.png")[:, :, 0:3]
 
-    image_res = (image-image_wm)+0.7
+    image_res = (image-image_wm)+0.4
 
     image_res[image_res < 0] = 0
     image_res[image_res > 1] = 1
@@ -27,6 +27,7 @@ def show_residual():
     plt.imshow(image_res)
 
     plt.show()
+    plt.imsave("87_RE.png",image_res)
 
 def show_hist():
     image = plt.imread("1_PR.png")[:, :, 0:3]
@@ -39,19 +40,21 @@ def show_hist():
     for i in range(0,51):
         bins.append(5*i)
 
-
-    print(bins)
-
     hist,bins = np.histogram(image, bins=bins)  
-    hist_wm,bins = np.histogram(image_wm, bins=bins)  
+    hist_wm,bins = np.histogram(image_wm, bins=bins)
 
     # plt.figure("normal")
     
     # plt.figure("wm")
+    
     plt.bar(range(len(hist)), hist_wm, color="coral")
-    plt.bar(range(len(hist)), hist)
+    plt.ylim((0,10000))
+    plt.xticks(bins)
+    # plt.bar(range(len(hist)), hist)
     plt.show()
 
+    print(hist)
+    print(hist_wm)
 
 
 show_hist()
