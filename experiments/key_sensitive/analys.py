@@ -19,7 +19,13 @@ if __name__ == "__main__":
 
     result = np.loadtxt(file)
 
+    task=["Colorizing","Deblur","Semantic Inpainting", "Object Inpainting"]
+    
     for i in range(0, len(result)):
-        plt.plot(result[i])
+        plt.plot(result[i], label=task[i])
+    
+    plt.xlabel("Error bits in key")
+    plt.ylabel("PSNR")
+    plt.legend(loc='upper right')
 
     plt.show()

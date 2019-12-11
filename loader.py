@@ -122,7 +122,7 @@ class DataLoader:
         """
         # get dataset file list
         dataset = tf.data.Dataset.list_files(
-            os.path.join(self.data_dir, "*.jpg"))
+            os.path.join(self.data_dir, "*.png"))
         # recalculate buffer size
         # if buffer_size<=0， adapted the buffer size
         # then buffer size is the dataset buffer size
