@@ -3,6 +3,7 @@ import sys
 import getopt
 import config
 import shutil
+import platform
 
 
 def create_train_bootstrap(watermark, extern_script=None):
@@ -17,11 +18,19 @@ def create_train_bootstrap(watermark, extern_script=None):
     if extern_script != None:
         run_cmd = run_cmd+" --script={}".format(extern_script)
 
-    run_cmd = run_cmd+"\r\n"
-
-    cmd = [run_cmd, "@pause\r\n"]
-    with open("train.bat", "w") as f:
-        f.writelines(cmd)
+    # 检查当前系统，如果是winsows系统，则生成bat; 如果是linux系统，则生成sh
+    system = platform.system()
+    if system == "Windows":
+        cmd = [run_cmd+"\r\n", "@pause\r\n"]
+        with open("train.bat", "w") as f:
+            f.writelines(cmd)
+    elif system == "Linux":
+        cmd = [run_cmd+"\n"]
+        with open("train.bat", "w") as f:
+                f.writelines(cmd)
+    else:
+        print("Error: System: {} is not supported currently.".format(system))
+        sys.exit()
 
 
 def create_config_bootstrap(app_name):
@@ -31,14 +40,15 @@ def create_config_bootstrap(app_name):
     @author yuwei
     """
 
-    #此命令用于隐藏cmd的黑框
+    # 此命令用于隐藏cmd的黑框
     invisible_cmd = ['@echo off\r\n',
                      'if "%1" == "h" goto begin\r\n',
                      'mshta vbscript:createobject("wscript.shell").run("%~nx0 h",0)(window.close)&&exit\r\n',
                      ':begin\r\n']
 
     # 运行cmd
-    run_cmd = "python ../../gui/ConfigUI/bootstrap.py -a {}\r\n".format(app_name)
+    run_cmd = "python ../../gui/ConfigUI/bootstrap.py -a {}\r\n".format(
+        app_name)
 
     with open("config.bat", "w") as f:
         f.writelines(invisible_cmd)
