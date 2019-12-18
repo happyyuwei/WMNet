@@ -454,9 +454,9 @@ def main(config_loader):
             train(train_dataset=train_dataset,
                   test_dataset=test_dataset, config_loader=config_loader, training_callback=training_callback)
     else:
-        # with tf.device("/gpu:0"):
-        train(train_dataset=train_dataset, test_dataset=test_dataset,
-                config_loader=config_loader, training_callback=training_callback)
+        with tf.device("/gpu:7"):
+            train(train_dataset=train_dataset, test_dataset=test_dataset,
+                    config_loader=config_loader, training_callback=training_callback)
 
 
 # bootstrap the train procedue
