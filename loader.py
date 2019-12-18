@@ -20,7 +20,8 @@ def load_image(image_file, input_num, is_train, image_width, image_height, flap_
     :param crop_height
     :return:
     """
-    image = tf.read_file(image_file)
+    # image = tf.read_file(image_file)
+    image = tf.io.read_file(image_file)
     image = tf.image.decode_jpeg(image)
 
     # only three channel currently
