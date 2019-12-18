@@ -22,7 +22,7 @@ from train import foreach_training
 from loader import load_cifar
 
 # execution
-tf.enable_eager_execution()
+# tf.enable_eager_execution()
 
 
 

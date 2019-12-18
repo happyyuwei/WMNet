@@ -22,8 +22,8 @@ import config
 import loader
 from train import foreach_training
 
-# execution
-tf.enable_eager_execution()
+# # execution
+# tf.enable_eager_execution()
 
 def create_mask_list():
     """

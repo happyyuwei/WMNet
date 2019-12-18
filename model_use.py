@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 
 from model import cgan, invisible_extract, auto
 
-tf.enable_eager_execution()
+#向下兼容
+# tensorflow 2.0 默认开启动态图，并且已经移除该api
+if int(tf.__version__.split(".")[0]) <=1:
+    tf.enable_eager_execution()
 
 
 class Model:

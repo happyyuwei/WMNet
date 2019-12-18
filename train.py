@@ -10,7 +10,11 @@ import importlib
 import numpy as np
 import tensorflow as tf
 
-tf.enable_eager_execution()
+#向下兼容
+# tensorflow 2.0 默认开启动态图，并且已经移除该api
+if int(tf.__version__.split(".")[0]) <=1:
+    tf.enable_eager_execution()
+
 
 
 """
@@ -480,6 +484,7 @@ if __name__ == "__main__":
                 print("-h -e dic -c config.txt")
             if key in ("-s", "--script"):
                 extern_script = value
+                
 
     # set current runtime environment
     os.chdir(env)
