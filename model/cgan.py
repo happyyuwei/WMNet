@@ -96,7 +96,7 @@ class Generator(tf.keras.Model):
                                                     padding='same',
                                                     kernel_initializer=initializer)
 
-    @tf.contrib.eager.defun
+    # @tf.contrib.eager.defun
     def call(self, x, training):
         # x shape == (bs, 256, 256, 3)
         x1 = self.down1(x, training=training)  # (bs, 128, 128, 64)
@@ -174,7 +174,7 @@ class Discriminator(tf.keras.Model):
                                            strides=1,
                                            kernel_initializer=initializer)
 
-    @tf.contrib.eager.defun
+    # @tf.contrib.eager.defun
     def call(self, inp, tar, training):
         # concatenating the input and the target
         x = tf.concat([inp, tar], axis=-1)  # (bs, 256, 256, channels*2)
