@@ -20,8 +20,8 @@ def load_image(image_file, input_num, is_train, image_width, image_height, flap_
     :param crop_height
     :return:
     """
-    # image = tf.read_file(image_file)
-    image = tf.io.read_file(image_file)
+    image = tf.read_file(image_file)
+    # image = tf.io.read_file(image_file)
     image = tf.image.decode_jpeg(image)
 
     # only three channel currently
@@ -104,6 +104,52 @@ def load_image(image_file, input_num, is_train, image_width, image_height, flap_
     return input_image, real_image
 
 
+def load_image_new(image_file, input_num, is_train, image_width, image_height, flap_probability, crop_width, crop_height):
+
+    image = tf.read_file(image_file)
+    # image = tf.io.read_file(image_file)
+    image = tf.image.decode_jpeg(image)
+
+    # only three channel currently
+    # author yuwei
+    # @since 2019.9.14
+    image = image[:, :, 0:3]
+
+    # get image width
+    w = tf.shape(image)[1]
+
+    w = w // (input_num + 1)
+    # the left is label, the right is input, 1 and 2
+    real_image = image[:, :w, :]
+    input_image_1 = image[:, w:2 * w, :]
+    if input_num == 2:
+        input_image_2 = image[:, 2 * w:3 * w, :]
+    else:
+        # useless input 2
+        input_image_2 = input_image_1
+
+    # to float 32
+    input_image_1 = tf.cast(input_image_1, tf.float32)
+    input_image_2 = tf.cast(input_image_2, tf.float32)
+    real_image = tf.cast(real_image, tf.float32)
+
+
+    # normalizing the images to [-1, 1]
+    input_image_1 = (input_image_1 / 127.5) - 1
+    if input_num == 2:
+        input_image_2 = (input_image_2 / 127.5) - 1
+    real_image = (real_image / 127.5) - 1
+
+    # concat if necessary
+    if input_num == 2:
+        input_image = tf.concat([input_image_1, input_image_2], axis=-1)
+    else:
+        input_image = input_image_1
+
+    return input_image, real_image
+
+
+
 class DataLoader:
 
     def __init__(self, data_dir, is_training):
@@ -140,7 +186,7 @@ class DataLoader:
 
         # pretreat images
         dataset = dataset.map(
-            lambda x: load_image(x, config_loader.input_num, self.is_training, config_loader.image_width,
+            lambda x: load_image_new(x, config_loader.input_num, self.is_training, config_loader.image_width,
                                  config_loader.image_height, config_loader.data_flip, config_loader.crop_width,
                                  config_loader.crop_height))
 
